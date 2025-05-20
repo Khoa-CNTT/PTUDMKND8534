@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 const Vendor = require('../models/vendor');
 const User = require('../models/user');
 const crypto = require('crypto');
-const sendOtpEmail = require('../helper/send_email'); // ✅ gửi email
-const otpStore = new Map(); // ✅ lưu OTP trong RAM
-const { auth } = require('../middlewares/auth'); // ✅ middleware xác thực người dùng
+const sendOtpEmail = require('../helper/send_email'); 
+const otpStore = new Map(); 
+const { auth } = require('../middlewares/auth'); 
 const authRouter = express.Router();
 
 // ✅ API ĐĂNG KÝ
@@ -15,7 +15,6 @@ authRouter.post('/api/signup', async (req, res) => {
     const { fullName, email, phone, password, image, address } = req.body;
 
     const existingVendorEmail = await Vendor.findOne({ email });
-    // Kiểm tra email đã tồn tại trong bảng vendor
     if (existingVendorEmail) {
       return res.status(400).json({ msg: "Email này đã được sử dụng" });
     }

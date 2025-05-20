@@ -10,10 +10,10 @@ const { auth,vendorAuth } = require('..//middlewares/auth');
 // Signup API
 VendorRouter.post('/api/v2/vendor/signup', async (req, res) => {
   try {
-    const { fullName, email, phone, password, storeName, storeImage, storeDescription , address =""} = req.body;
+    const { fullName, email, phone, password, storeName = "", storeImage = "", storeDescription = "", address = "" } = req.body;
 
-    const  exitstingUserEmail = await User.findOne({ email });
-    if (exitstingUserEmail) {
+    const existingUserEmail = await User.findOne({ email });
+    if (existingUserEmail) {
       return res.status(400).json({ msg: "Email này đã được sử dụng" });
     }
 
@@ -29,7 +29,7 @@ VendorRouter.post('/api/v2/vendor/signup', async (req, res) => {
       fullName,
       email,
       phone,
-      address: address || "",
+      address,
       password: hashedPassword,
       storeName,
       storeImage,
@@ -40,10 +40,13 @@ VendorRouter.post('/api/v2/vendor/signup', async (req, res) => {
 
     return res.json({ vendor });
   } catch (e) {
+    if (e.name === 'ValidationError') {
+      const errors = Object.values(e.errors).map(err => err.message);
+      return res.status(400).json({ msg: "Xác thực thất bại", errors });
+    }
     return res.status(500).json({ error: e.message });
   }
 });
-
 // Login API 
 VendorRouter.post('/api/v2/vendor/signin', async (req, res) => {
   try {

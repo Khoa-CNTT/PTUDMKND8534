@@ -39,7 +39,7 @@ class _RegisterPageState extends State<RegisterPage> {
         fullName: fullName,
         email: email,
         phone: phone,
-        address: "", // Address không được sử dụng trong phiên bản GetX
+        address: "",
         password: password,
         context: context,
       );

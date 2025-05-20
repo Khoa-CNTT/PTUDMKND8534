@@ -14,7 +14,7 @@ import '../views/screens/authentication/main_vendor_page.dart';
 
 class VendorAuthController {
   // ✅ Đăng ký Vendor
-  Future<void> signUpVendor({
+  Future<void>  signUpVendor({
     required BuildContext context,
     required String email,
     required String phone,

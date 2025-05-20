@@ -6,7 +6,6 @@ const vendorSchema = mongoose.Schema({
     required: true,
     trim: true,
   },
-
   email: {
     type: String,
     required: true,
@@ -19,7 +18,6 @@ const vendorSchema = mongoose.Schema({
       message: "Vui lòng nhập địa chỉ email hợp lệ",
     },
   },
-
   phone: {
     type: String,
     required: true,
@@ -29,29 +27,27 @@ const vendorSchema = mongoose.Schema({
       message: "Số điện thoại phải có 10 chữ số và bắt đầu bằng số 0",
     },
   },
-
-
   address: {
     type: String,
     default: "",
     trim: true,
   },
-
-
-  storeName:{
-    type:String,
-    required:true,
+  storeName: {
+    type: String,
+    required: false, 
+    default: "", 
+    trim: true,
   },
-  storeImage:{
-    type:String,
-    required:true,
+  storeImage: {
+    type: String,
+    required: false, 
+    default: "",
   },
-  storeDescription:{
-    type:String,
-    required:true,
+  storeDescription: {
+    type: String,
+    required: false, 
+    default: "", 
   },
-
-
   password: {
     type: String,
     required: true,
@@ -60,7 +56,6 @@ const vendorSchema = mongoose.Schema({
       message: "Mật khẩu phải có ít nhất 8 ký tự",
     },
   },
-
   role: {
     type: String,
     required: true,
