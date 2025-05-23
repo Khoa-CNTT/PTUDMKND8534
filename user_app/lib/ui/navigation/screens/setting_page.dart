@@ -82,8 +82,8 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                       ),
                     ),
                     Positioned(
-                      top: 70,
-                      left: 150,
+                      top: 80,
+                      left: 160,
                       child: Stack(
                         clipBehavior: Clip.none,
                         children: [
@@ -91,29 +91,6 @@ class _SettingPageState extends ConsumerState<SettingPage> {
                           CircleAvatar(
                             radius: 40,
                             backgroundImage: _buildUserImage(user!.image),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  return MyProfileWidget(
-                                    image: user.image,
-                                    fullName: user.fullName,
-                                    phone: user.phone,
-                                    email: user.email,
-                                    address: user.address,
-                                  );
-                                })).then((_) => _refreshData()); // Refresh after returning from profile edit
-                              },
-                              child: SvgPicture.asset(
-                                AppImages.icEdit,
-                                width: 20,
-                                height: 20,
-                                color: AppColors.white,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -353,10 +330,20 @@ class _SettingPageState extends ConsumerState<SettingPage> {
               ),
               const SizedBox(height: 5),
               ListTile(
-                onTap: () {},
-                leading: const Icon(Icons.help_outline),
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return MyProfileWidget(
+                      image: user.image,
+                      fullName: user.fullName,
+                      phone: user.phone,
+                      email: user.email,
+                      address: user.address,
+                    );
+                  })).then((_) => _refreshData());
+                },
+                leading: const Icon(Icons.edit),
                 title: Text(
-                  "Trợ giúp",
+                  "Chỉnh sửa thông tin",
                   style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.blackFont),
                 ),
               ),

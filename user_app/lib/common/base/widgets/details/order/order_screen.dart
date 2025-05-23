@@ -137,7 +137,7 @@ class _OrderScreenState extends ConsumerState<OrderScreen> {
                                       const SizedBox(height: 4),
                                       Text(
                                         formatCurrency(order.productPrice),
-                                        style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.blackFont),
+                                        style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.bluePrimary),
                                       ),
                                       const SizedBox(height: 8),
                                       Container(

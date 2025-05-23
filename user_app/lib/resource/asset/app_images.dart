@@ -45,4 +45,5 @@ class AppImages {
   static const imgDone = '${assetsImage}done.png';
   static const imgFavorite = '${assetsImage}favorite.png';
   static const imgDefaultAvatar = '${assetsImage}default_avatar.png';
+  static const imgBt = '${assetsImage}bt.png';
 }

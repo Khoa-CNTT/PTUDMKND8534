@@ -23,4 +23,18 @@ categoryRouter.get('/api/categories', async(req,res)=>{
     }
 });
 
+// xóa category
+categoryRouter.delete('/api/categories/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deleteCategory = await Category.findByIdAndDelete(id);
+        if (!deleteCategory) {
+            return res.status(404).json({ msg: "Không tìm thấy danh mục" });
+        } else {
+            return res.status(200).json({ msg: "Danh mục đã xóa" });
+        }
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
 module.exports = categoryRouter;

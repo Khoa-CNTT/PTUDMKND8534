@@ -8,7 +8,10 @@ class OrderProvider extends StateNotifier<List<Order>> {
   void setOrders(List<Order> orders) {
     state = orders;
   }
-
+// Hàm tính tổng tiền của một mặt hàng (Order)
+  double calculateItemTotal(Order order) {
+    return order.quantity.toDouble() * order.productPrice;
+  }
   void updateOrderStatus(String orderId, {bool? processing, bool? delivered}) {
     state = [
       for (final order in state)
@@ -34,6 +37,9 @@ class OrderProvider extends StateNotifier<List<Order>> {
     ];
   }
 }
+
+
+
 
 final orderProvider = StateNotifierProvider<OrderProvider, List<Order>>(
   (ref) {

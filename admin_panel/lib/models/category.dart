@@ -16,7 +16,6 @@ class Category {
   // Chuyển đổi từ Object sang Map (Gửi API)
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
       'name': name,
       'image': image,
       'banner': banner,
@@ -28,10 +27,10 @@ class Category {
   // Chuyển đổi từ Map sang Object (Nhận API)
   factory Category.fromJson(Map<String, dynamic> map) {
     return Category(
-      id: map['_id'] as String? ?? '',
-      name: map['name'] as String? ?? '',
-      image: map['image'] as String? ?? '',
-      banner: map['banner'] as String? ?? '',
+      id: map['_id']?.toString() ?? '',
+      name: map['name']?.toString() ?? '',
+      image: map['image']?.toString() ?? '',
+      banner: map['banner']?.toString() ?? '',
     );
   }
 }

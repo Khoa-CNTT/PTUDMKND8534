@@ -10,4 +10,6 @@ class AppImages {
   static const icProduct = '${assetIcons}product.svg';
   static const icBuyer ='${assetIcons}buyer.svg';
   static const icUpload = '${assetIcons}upload.svg';
+  static const imgDefaultAvatar = '${assetImages}default_avatar.png';
+
 }

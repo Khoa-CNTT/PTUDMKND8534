@@ -9,31 +9,32 @@ class BannerModel {
   // Chuyển đổi từ Object sang Map
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'id': id,
+      // Không gửi 'id' vì backend tự tạo '_id'
       'image': image,
     };
   }
 
   // Chuyển đổi từ Map sang Object
   factory BannerModel.fromMap(Map<String, dynamic> map) {
+    print('BannerModel: Parsing map: $map'); // Log dữ liệu thô
     return BannerModel(
-      id: map['id'] as String? ?? '',
-      image: map['image'] as String? ?? '',
+      id: map['_id']?.toString() ?? '', // Ánh xạ '_id' thay vì 'id'
+      image: map['image']?.toString() ?? '',
     );
   }
 
   // Chuyển đổi từ Object sang chuỗi JSON
   String toJson() => json.encode(toMap());
 
-  // Chuyển đổi từ chuỗi JSON sang Object
+  // Chuyển đổi từ chuỗi JSON hoặc Map sang Object
   factory BannerModel.fromJson(dynamic source) {
-  if (source is String) {
-    return BannerModel.fromMap(json.decode(source) as Map<String, dynamic>);
-  } else if (source is Map<String, dynamic>) {
-    return BannerModel.fromMap(source);
-  } else {
-    throw Exception("Invalid JSON format for BannerModel");
+    print('BannerModel: Parsing JSON: $source'); // Log dữ liệu JSON
+    if (source is String) {
+      return BannerModel.fromMap(json.decode(source) as Map<String, dynamic>);
+    } else if (source is Map<String, dynamic>) {
+      return BannerModel.fromMap(source);
+    } else {
+      throw Exception("Invalid JSON format for BannerModel");
+    }
   }
-}
-
 }

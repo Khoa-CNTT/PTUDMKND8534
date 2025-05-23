@@ -18,7 +18,7 @@ class BuyersScreen extends StatelessWidget {
             Container(
               alignment: Alignment.topLeft,
               child: Text(
-                'Quản lý nhà bán hàng',
+                'Danh sách người dùng',
                 style: GoogleFonts.montserrat(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,

@@ -49,7 +49,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
   Future<void> _getUrlPayment() async {
     http.Response response = await http.post(
-        Uri.parse('https://vnpay-payment-production.up.railway.app/order/create_payment_url'),
+        Uri.parse('https://backend-vnpay-a8aa14777084.herokuapp.com/order/create_payment_url'),
         body: {'amount': widget.amount.toInt().toString(), 'bankCode': '', 'language': 'vn'});
 
     if (response.statusCode == 200) {

@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:vendor_store/controllers/vendor_auth_controller.dart';
 import 'package:vendor_store/views/screens/authentication/login_page.dart';
@@ -8,6 +10,7 @@ import '../../../common/widgets/app_text_field.dart';
 import '../../../resource/asset/app_images.dart';
 import '../../../resource/theme/app_colors.dart';
 import '../../../resource/theme/app_styles.dart';
+import '../../../services/manage_http_response.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -20,66 +23,48 @@ class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
   final VendorAuthController _vendorAuthController = VendorAuthController();
   final ImagePicker picker = ImagePicker();
+  final ValueNotifier<File?> imageNotifier = ValueNotifier<File?>(null);
 
   String fullName = "";
   String email = "";
   String phone = "";
   String password = "";
-  File? imageFile;
   bool isLoading = false;
 
-  // Xử lý đăng ký
-  void registerUser() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        isLoading = true;
-      });
-
-      await _vendorAuthController.signUpVendor(
-        fullName: fullName,
-        email: email,
-        phone: phone,
-        address: "",
-        password: password,
-        context: context,
-      );
-
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  // Chọn ảnh từ thư viện hoặc máy ảnh
+  // Pick image from gallery or camera
   Future<void> pickImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source);
     if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
+      imageNotifier.value = File(pickedFile.path);
+    } else {
+      showSnackBar(context, "Không lấy được ảnh");
     }
   }
 
-  // Hiển thị bottom sheet để chọn ảnh
+  // Show bottom sheet for image source selection
   void _showImagePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       builder: (_) {
         return Container(
           padding: const EdgeInsets.all(20),
-          child: Wrap(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text("Chọn từ thư viện"),
+                leading: const Icon(CupertinoIcons.photo, color: AppColors.bluePrimary),
+                title: Text("Chọn từ thư viện", style: AppStyles.STYLE_16),
                 onTap: () {
                   pickImage(ImageSource.gallery);
                   Navigator.of(context).pop();
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera),
-                title: const Text("Chụp ảnh"),
+                leading: const Icon(CupertinoIcons.camera, color: AppColors.bluePrimary),
+                title: Text("Chụp ảnh", style: AppStyles.STYLE_16),
                 onTap: () {
                   pickImage(ImageSource.camera);
                   Navigator.of(context).pop();
@@ -90,6 +75,51 @@ class _RegisterPageState extends State<RegisterPage> {
         );
       },
     );
+  }
+
+  // Handle registration
+  Future<void> registerUser() async {
+    if (_formKey.currentState!.validate()) {
+      // Kiểm tra xem ảnh có được chọn hay không
+      if (imageNotifier.value == null) {
+        showSnackBar(context, "Vui lòng chọn ảnh đại diện");
+        return;
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        // Tải ảnh lên Cloudinary
+        final cloudinary = CloudinaryPublic("dajwnmjjf", "tb9fytch");
+        CloudinaryResponse imageResponse = await cloudinary.uploadFile(
+          CloudinaryFile.fromFile(
+            imageNotifier.value!.path,
+            identifier: "vendor_profile",
+            folder: "storeImage",
+          ),
+        );
+        String imageUrl = imageResponse.secureUrl;
+
+        // Gọi signUpVendor với URL ảnh
+        await _vendorAuthController.signUpVendor(
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          address: "",
+          password: password,
+          context: context,
+          storeImage: imageUrl, // Truyền URL ảnh
+        );
+      } catch (e) {
+        showSnackBar(context, "Lỗi khi đăng ký: $e");
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -124,17 +154,34 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // Ô chọn ảnh đại diện
-                      GestureDetector(
-                        onTap: () => _showImagePicker(context),
-                        child: CircleAvatar(
-                          radius: 50,
-                          backgroundColor: AppColors.gold50,
-                          backgroundImage: imageFile != null ? FileImage(imageFile!) : null,
-                          child: imageFile == null
-                              ? const Icon(Icons.camera_alt, size: 40, color: Colors.blue)
-                              : null,
-                        ),
+                      // Image selection
+                      ValueListenableBuilder(
+                        valueListenable: imageNotifier,
+                        builder: (context, image, child) {
+                          return InkWell(
+                            onTap: () => _showImagePicker(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.grey, width: 2),
+                              ),
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundImage: image != null
+                                    ? FileImage(image)
+                                    : const AssetImage(AppImages.imgDefaultAvatar),
+                                child: image == null
+                                    ? const Icon(
+                                  CupertinoIcons.photo,
+                                  size: 40,
+                                  color: AppColors.bluePrimary,
+                                )
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 20),
 
@@ -186,9 +233,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context){
-                                return  const LoginPage();
-                              }));
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
+                              );
                             },
                             child: Text(
                               " Đăng nhập",

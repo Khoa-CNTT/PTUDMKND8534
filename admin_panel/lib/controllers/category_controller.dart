@@ -4,6 +4,7 @@ import 'package:admin_panel_app_web/global_variable.dart';
 import 'package:admin_panel_app_web/models/category.dart';
 import 'package:admin_panel_app_web/services/manage_http_response.dart';
 import 'package:cloudinary_public/cloudinary_public.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CategoryController {
@@ -73,4 +74,29 @@ class CategoryController {
   }
 }
 
+// Xóa danh mục
+  Future<void> deleteCategory({required String categoryId, required BuildContext context}) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$uri/api/categories/$categoryId'),
+        headers: <String, String>{
+          "Content-Type": 'application/json; charset=UTF-8',
+        },
+      );
+
+      manageHttpResponse(
+        response: response,
+        context: context,
+        onSuccess: () {
+          if (context.mounted) {
+            showSnackBar(context, 'Danh mục đã được xóa');
+          }
+        },
+      );
+    } catch (e) {
+      if (context.mounted) {
+        showSnackBar(context, 'Lỗi khi xóa danh mục: $e');
+      }
+    }
+  }
 }

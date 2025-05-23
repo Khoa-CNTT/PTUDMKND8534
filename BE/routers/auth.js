@@ -243,7 +243,41 @@ authRouter.delete('/api/user/delete-account/:id', auth, async (req, res) => {
   }
 });
 
+// xoa tài khoản người dùng
+authRouter.delete('/api/user/delete/:id',  async (req, res) => {
+  try {
+    const { id } = req.params;
 
+    const user = await User.findByIdAndDelete(id);
+
+    if (!user) {
+      return res.status(404).json({ msg: "Không tìm thấy người dùng" });
+    }
+
+    return res.status(200).json({ msg: "Xóa tài khoản thành công" });
+
+  } catch (error) {
+    return res.status(500).json({ error: "Lỗi xóa tài khoản: " + error.message });
+  }
+});
+
+// xoa tài khoản vendor
+authRouter.delete('/api/vendor/delete/:id',  async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const vendor = await Vendor.findByIdAndDelete(id);
+
+    if (!vendor) {
+      return res.status(404).json({ msg: "Không tìm thấy vendor" });
+    }
+
+    return res.status(200).json({ msg: "Xóa tài khoản thành công" });
+
+  } catch (error) {
+    return res.status(500).json({ error: "Lỗi xóa tài khoản: " + error.message });
+  }
+});
 
 
 module.exports = authRouter;

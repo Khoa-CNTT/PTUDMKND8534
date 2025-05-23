@@ -12,7 +12,6 @@ class VendorProvider extends StateNotifier<Vendor?> {
     email: '',
     phone: '',
     address: '',
-    image: '',
     role: '',
     password: '',
     token: '',

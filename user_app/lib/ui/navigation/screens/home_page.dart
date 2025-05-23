@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:multi_store/common/base/widgets/common/custom_search.dart';
 import 'package:multi_store/common/base/widgets/common/reusable_text_widget.dart';
 import 'package:multi_store/common/base/widgets/details/products/all_product_page.dart';
 import 'package:multi_store/common/base/widgets/details/products/all_product_widget.dart';
@@ -31,7 +32,7 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 5),
+
             const BannerWidget(),
             const SizedBox(height: 5),
             const CategoryItemWidget(),

@@ -20,7 +20,7 @@ class VendorAuthController {
     required String phone,
     required String fullName,
     required String password,
-    String image = '',
+    String storeImage = '',
     String address = '',
   }) async {
     try {
@@ -29,7 +29,7 @@ class VendorAuthController {
         "phone": phone,
         "fullName": fullName,
         "password": password,
-        "image": image,
+        "storeImage": storeImage,
         "address": address,
       });
 

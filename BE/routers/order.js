@@ -28,6 +28,7 @@ orderRouter.post('/api/orders', auth, async (req, res) => {
   }
 });
 
+
 // Lấy đơn hàng theo buyerId
 orderRouter.get('/api/orders/:buyerId', async (req, res) => {
   try {
@@ -59,7 +60,7 @@ orderRouter.get('/api/orders/vendor/:vendorId', async (req, res) => {
   try {
     const { vendorId } = req.params;
     const orders = await Order.find({ vendorId });
-    return res.status(200).json(orders); // ✅ trả về [] nếu không có đơn
+    return res.status(200).json(orders); 
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }
@@ -109,7 +110,7 @@ orderRouter.patch('/api/orders/:id/processing', async (req, res) => {
 orderRouter.get('/api/orders', async (req, res) => {
   try {
     const orders = await Order.find();
-    return res.status(200).json(orders); // ✅
+    return res.status(200).json(orders); 
   } catch (e) {
     return res.status(500).json({ error: e.message });
   }

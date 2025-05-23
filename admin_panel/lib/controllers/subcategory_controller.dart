@@ -37,7 +37,7 @@ class SubcategoryController {
           }
       );
       manageHttpResponse(response: response, context: context, onSuccess: (){
-        showSnackBar(context, "Subcategory Uploaded");
+        showSnackBar(context, "Upload thành công");
       });
     } catch (e) {
       print("$e");
@@ -54,7 +54,6 @@ class SubcategoryController {
         },
       );
 
-      print("API Response: ${response.body}"); // ✅ Kiểm tra dữ liệu từ API
 
       if (response.statusCode == 200) {
         final dynamic data = jsonDecode(response.body);

@@ -13,8 +13,8 @@ class CustomSearch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 260,
-      height: 40,
+      width: 330,
+      height: 60,
       child: TextField(
         readOnly: true,
         onTap: () {
@@ -24,8 +24,8 @@ class CustomSearch extends StatelessWidget {
           );
         },
         decoration: InputDecoration(
-          hintText: "search".tr,
-          hintStyle: AppStyles.STYLE_14.copyWith(color: AppColors.greyDark),
+          hintText: "Tìm kiếm sản phẩm",
+          hintStyle: AppStyles.STYLE_14.copyWith(color: AppColors.bluePrimary),
           contentPadding: const EdgeInsets.symmetric(horizontal: 12),
           suffixIcon: GestureDetector(
             onTap: () {
@@ -36,10 +36,11 @@ class CustomSearch extends StatelessWidget {
                 AppImages.icCamera,
                 width: 8,
                 height: 8,
+                 color: AppColors.bluePrimary,
               ),
             ),
           ),
-          fillColor: AppColors.white40,
+          fillColor: AppColors.white,
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8),

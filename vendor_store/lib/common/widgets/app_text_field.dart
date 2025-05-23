@@ -5,7 +5,6 @@ import '../../resource/asset/app_images.dart';
 import '../../resource/theme/app_colors.dart';
 import '../../resource/theme/app_styles.dart';
 
-
 class AppTextField extends StatefulWidget {
   final String hintText;
   final String prefixImage;
@@ -31,63 +30,92 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      obscureText: widget.isPassword ? _isObscured : false,
-      validator: widget.validator,
-      onChanged: widget.onChanged,
-      decoration: InputDecoration(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-
-        filled: true,
-        fillColor: AppColors.white40,
-        hintText: widget.hintText,
-        hintStyle: AppStyles.STYLE_14.copyWith(color: AppColors.black80),
-
-
-        prefixIcon: widget.prefixImage.isNotEmpty
-            ? Padding(
-          padding: const EdgeInsets.all(12),
-          child: SvgPicture.asset(widget.prefixImage, width: 20, height: 20),
-        ) : null,
-
-
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.white40, AppColors.white],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30),
-          borderSide: BorderSide.none,
-        ),
-
-
-        suffixIcon: widget.isPassword
-            ? IconButton(
-          icon: SvgPicture.asset(
-            _isObscured ? AppImages.icEyes : AppImages.icEyes,
-            width: 20,
-            height: 20,
-            color: Colors.grey,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          onPressed: () {
-            setState(() {
-              _isObscured = !_isObscured;
-            });
-          },
-        )
-            : null,
+        ],
+      ),
+      child: TextFormField(
+        obscureText: widget.isPassword ? _isObscured : false,
+        validator: widget.validator,
+        onChanged: widget.onChanged,
+        decoration: InputDecoration(
+          contentPadding:
+          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          filled: true,
+          fillColor: Colors.transparent,
+          hintText: widget.hintText,
+          hintStyle: AppStyles.STYLE_14.copyWith(
+            color: AppColors.black80,
+            fontWeight: FontWeight.w400,
+          ),
+          prefixIcon: widget.prefixImage.isNotEmpty
+              ? Padding(
+            padding: const EdgeInsets.all(12),
+            child: SvgPicture.asset(
+              widget.prefixImage,
+              width: 24,
+              height: 24,
+              color: AppColors.black80,
+            ),
+          )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(
+              color: AppColors.bluePrimary,
+              width: 2,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(
+              color: AppColors.pink,
+              width: 2,
+            ),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15),
+            borderSide: const BorderSide(
+              color: AppColors.pink,
+              width: 2,
+            ),
+          ),
+          suffixIcon: widget.isPassword
+              ? IconButton(
+            icon: SvgPicture.asset(
+              _isObscured ? AppImages.icEyes : AppImages.icEyes,
+              width: 24,
+              height: 24,
+              color: AppColors.blackFont,
+            ),
+            onPressed: () {
+              setState(() {
+                _isObscured = !_isObscured;
+              });
+            },
+          )
+              : null,
+        ),
       ),
     );
   }

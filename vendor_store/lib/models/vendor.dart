@@ -5,7 +5,6 @@ class Vendor {
   final String fullName;
   final String email;
   final String phone;
-  final String image;
   final String address;
   final String role;
   final String password;
@@ -18,7 +17,6 @@ class Vendor {
     required this.fullName,
     required this.email,
     required this.phone,
-    required this.image,
     required this.address,
     required this.role,
     required this.password,
@@ -34,7 +32,6 @@ class Vendor {
       'fullName': fullName,
       'email': email,
       'phone': phone,
-      'image': image,
       'address': address,
       'role': role,
       'password': password,
@@ -54,7 +51,6 @@ class Vendor {
       fullName: map['fullName'] as String? ?? '',
       email: map['email'] as String? ?? '',
       phone: map['phone'] as String? ?? '',
-      image: map['image'] as String? ?? '',
       address: map['address'] as String? ?? '',
       role: map['role'] as String? ?? '',
       password: map['password'] as String? ?? '',

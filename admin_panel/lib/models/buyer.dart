@@ -19,10 +19,9 @@ class Buyer {
     required this.password,
   });
 
-  // Chuyen doi doi tuong Buyer thanh Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      '_id': id,
       'fullName': fullName,
       'email': email,
       'phone': phone,
@@ -32,10 +31,9 @@ class Buyer {
     };
   }
 
-  // Tao doi tuong Buyer tu Map<String, dynamic>
   factory Buyer.fromMap(Map<String, dynamic> map) {
     return Buyer(
-      id: map['id']?.toString() ?? '',
+      id: map['_id']?.toString() ?? '',
       fullName: map['fullName']?.toString() ?? '',
       email: map['email']?.toString() ?? '',
       phone: map['phone']?.toString() ?? '',
@@ -45,10 +43,8 @@ class Buyer {
     );
   }
 
-  // Chuyen doi doi tuong Buyer thanh chuoi JSON
   String toJson() => jsonEncode(toMap());
 
-  // Tao doi tuong Buyer tu chuoi JSON
   factory Buyer.fromJson(String source) =>
       Buyer.fromMap(jsonDecode(source) as Map<String, dynamic>);
 }

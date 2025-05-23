@@ -10,13 +10,19 @@ class CategoryWidget extends StatefulWidget {
 }
 
 class _CategoryWidgetState extends State<CategoryWidget> {
-  // A future that will hold the list of categories once loaded from the API
   late Future<List<Category>> futureCategories;
+  bool _isDeleting = false;
 
   @override
   void initState() {
     super.initState();
     futureCategories = CategoryController().loadCategories();
+  }
+
+  void _refreshCategories() {
+    setState(() {
+      futureCategories = CategoryController().loadCategories();
+    });
   }
 
   @override
@@ -39,32 +45,94 @@ class _CategoryWidgetState extends State<CategoryWidget> {
         } else {
           final categories = snapshot.data!;
           return GridView.builder(
-            shrinkWrap: true, 
-            physics:
-                const NeverScrollableScrollPhysics(), 
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.all(8.0),
             itemCount: categories.length,
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 6, 
+              crossAxisCount: 6,
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 1, 
+              childAspectRatio: 1,
             ),
             itemBuilder: (context, index) {
               final category = categories[index];
-              return Column(
+              return Stack(
                 children: [
-                  Image.network(
-                    category.image,
-                    height: 150, 
-                    width: double.infinity,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(Icons.broken_image,
-                          size: 50, color: Colors.grey);
-                    },
+                  Column(
+                    children: [
+                      Image.network(
+                        category.image,
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.broken_image,
+                            size: 50,
+                            color: Colors.grey,
+                          );
+                        },
+                      ),
+                      Text(
+                        category.name,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
                   ),
-                  Text(category.name, textAlign: TextAlign.center),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: IconButton(
+                      icon: _isDeleting
+                          ? const CircularProgressIndicator(strokeWidth: 2)
+                          : const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                        size: 24,
+                      ),
+                      onPressed: _isDeleting
+                          ? null
+                          : () async {
+                        if (category.id.isEmpty) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("ID danh mục không hợp lệ")),
+                            );
+                          }
+                          return;
+                        }
+                        setState(() => _isDeleting = true);
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Xóa Danh mục'),
+                            content: const Text('Bạn có chắc muốn xóa danh mục này?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Hủy'),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Xóa'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true && context.mounted) {
+                          await CategoryController().deleteCategory(
+                            categoryId: category.id,
+                            context: context,
+                          );
+                          _refreshCategories();
+                        }
+                        setState(() => _isDeleting = false);
+                      },
+                    ),
+                  ),
                 ],
               );
             },

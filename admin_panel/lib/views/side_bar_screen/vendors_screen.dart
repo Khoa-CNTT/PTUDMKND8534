@@ -17,7 +17,7 @@ class VendorsScreen extends StatelessWidget {
           Container(
             alignment: Alignment.topLeft,
             child: Text(
-              'Quản lý nhà cung cấp',
+              'Danh sách nhà cung cấp',
               style: GoogleFonts.montserrat(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,

@@ -1,83 +1,74 @@
-import 'dart:convert';
 import 'dart:io';
+import 'package:cloudinary_public/cloudinary_public.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_store/common/base/widgets/common/app_button.dart';
-import 'package:multi_store/common/base/widgets/common/app_text_field.dart';
-import 'package:multi_store/resource/asset/app_images.dart';
-import 'package:multi_store/resource/theme/app_colors.dart';
-import 'package:multi_store/resource/theme/app_style.dart';
 import 'package:multi_store/controller/auth_controller.dart';
-import 'package:multi_store/ui/authentication/login/screen/login_page.dart';
-import 'package:dotted_border/dotted_border.dart';
 
-class RegisterPage extends ConsumerStatefulWidget {
+import '../../../../common/base/widgets/common/app_button.dart';
+import '../../../../common/base/widgets/common/app_text_field.dart';
+import '../../../../resource/asset/app_images.dart';
+import '../../../../resource/theme/app_colors.dart';
+import '../../../../resource/theme/app_style.dart';
+import '../../../../services/manage_http_response.dart';
+import '../../login/screen/login_page.dart';
+
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  ConsumerState<RegisterPage> createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends ConsumerState<RegisterPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final AuthController _authController = AuthController();
+  final ImagePicker picker = ImagePicker();
+  final ValueNotifier<File?> imageNotifier = ValueNotifier<File?>(null);
 
-  String fullName = '';
-  String email = '';
-  String phone = '';
-  String password = '';
-  File? imageFile;
+  String fullName = "";
+  String email = "";
+  String phone = "";
+  String password = "";
   bool isLoading = false;
 
-  Future<void> _pickImage(ImageSource source) async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.pickImage(source: source, imageQuality: 70);
-    if (pickedImage != null) {
-      setState(() {
-        imageFile = File(pickedImage.path);
-      });
+  // Pick image from gallery or camera
+  Future<void> pickImage(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
+    if (pickedFile != null) {
+      imageNotifier.value = File(pickedFile.path);
+    } else {
+      showSnackBar(context, "Không lấy được ảnh");
     }
   }
 
-  Future<void> _registerUser(BuildContext context) async {
-    setState(() => isLoading = true);
-    final base64Image = imageFile != null ? base64Encode(await imageFile!.readAsBytes()) : '';
-
-    await AuthController().signUpUsers(
-      context: context,
-      email: email,
-      phone: phone,
-      fullName: fullName,
-      password: password,
-      image: base64Image,
-      address: '',
-    );
-
-    setState(() => isLoading = false);
-  }
-
+  // Show bottom sheet for image source selection
   void _showImagePicker(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
       builder: (_) {
         return Container(
           padding: const EdgeInsets.all(20),
-          child: Wrap(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text("Chọn từ thư viện"),
+                leading: const Icon(CupertinoIcons.photo, color: AppColors.bluePrimary),
+                title: Text("Chọn từ thư viện", style: AppStyles.STYLE_16),
                 onTap: () {
-                  _pickImage(ImageSource.gallery);
-                  Navigator.pop(context);
+                  pickImage(ImageSource.gallery);
+                  Navigator.of(context).pop();
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.camera),
-                title: const Text("Chụp ảnh"),
+                leading: const Icon(CupertinoIcons.camera, color: AppColors.bluePrimary),
+                title: Text("Chụp ảnh", style: AppStyles.STYLE_16),
                 onTap: () {
-                  _pickImage(ImageSource.camera);
-                  Navigator.pop(context);
+                  pickImage(ImageSource.camera);
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -87,123 +78,177 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     );
   }
 
+  // Handle registration
+  Future<void> registerUser() async {
+    if (_formKey.currentState!.validate()) {
+      if (imageNotifier.value == null) {
+        showSnackBar(context, "Vui lòng chọn ảnh đại diện");
+        return;
+      }
+
+      setState(() {
+        isLoading = true;
+      });
+
+      try {
+        // Tải ảnh lên Cloudinary
+        final cloudinary = CloudinaryPublic("dajwnmjjf", "tb9fytch");
+        CloudinaryResponse imageResponse = await cloudinary.uploadFile(
+          CloudinaryFile.fromFile(
+            imageNotifier.value!.path,
+            identifier: "vendor_profile",
+            folder: "storeImage",
+          ),
+        );
+        String imageUrl = imageResponse.secureUrl;
+
+        // Gọi signUpVendor với URL ảnh
+        await _authController.signUpUsers(
+          fullName: fullName,
+          email: email,
+          phone: phone,
+          address: "",
+          password: password,
+          context: context,
+          image: imageUrl,
+        );
+      } catch (e) {
+        showSnackBar(context, "Lỗi khi đăng ký: $e");
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           SizedBox(
             height: screenHeight * 0.4,
             width: double.infinity,
-            child: Image.asset(AppImages.imgBrSignUp, fit: BoxFit.cover),
+            child: Image.asset(
+              AppImages.imgBrSignUp,
+              fit: BoxFit.cover,
+            ),
           ),
-          SafeArea(
+          Padding(
+            padding: const EdgeInsets.all(20.0),
             child: Center(
               child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Đăng ký",
-                            style: AppStyles.STYLE_36_BOLD.copyWith(color: AppColors.black),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Đăng ký",
+                        style: AppStyles.STYLE_36_BOLD.copyWith(color: Colors.black),
+                      ),
+                      const SizedBox(height: 20),
 
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: GestureDetector(
+                      // Image selection
+                      ValueListenableBuilder(
+                        valueListenable: imageNotifier,
+                        builder: (context, image, child) {
+                          return InkWell(
                             onTap: () => _showImagePicker(context),
-                            child: DottedBorder(
-                              borderType: BorderType.Circle,
-                              dashPattern: const [6, 4],
-                              color: AppColors.bluePrimary,
-                              strokeWidth: 2,
+                            child: Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.grey, width: 2),
+                              ),
                               child: CircleAvatar(
                                 radius: 50,
-                                backgroundColor: AppColors.white40,
-                                backgroundImage: imageFile != null ? FileImage(imageFile!) : null,
-                                child: imageFile == null
+                                backgroundImage: image != null
+                                    ? FileImage(image)
+                                    : const AssetImage(AppImages.imgDefaultAvatar),
+                                child: image == null
                                     ? const Icon(
-                                  Icons.camera_alt,
+                                  CupertinoIcons.photo,
                                   size: 40,
                                   color: AppColors.bluePrimary,
                                 )
                                     : null,
                               ),
                             ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      AppTextField(
+                        hintText: "Nhập họ và tên",
+                        prefixImage: AppImages.icUser,
+                        onChanged: (value) => fullName = value,
+                        validator: (value) => value!.isEmpty ? "Vui lòng nhập họ và tên" : null,
+                      ),
+                      const SizedBox(height: 15),
+                      AppTextField(
+                        hintText: "Nhập email",
+                        prefixImage: AppImages.icMail,
+                        onChanged: (value) => email = value,
+                        validator: (value) => value!.isEmpty ? "Vui lòng nhập email" : null,
+                      ),
+                      const SizedBox(height: 15),
+                      AppTextField(
+                        hintText: "Nhập số điện thoại",
+                        prefixImage: AppImages.icUser,
+                        onChanged: (value) => phone = value,
+                        validator: (value) => value!.isEmpty ? "Vui lòng nhập số điện thoại" : null,
+                      ),
+                      const SizedBox(height: 15),
+                      AppTextField(
+                        hintText: "Nhập mật khẩu",
+                        prefixImage: AppImages.icPassword,
+                        isPassword: true,
+                        onChanged: (value) => password = value,
+                        validator: (value) => value!.length < 6 ? "Mật khẩu phải có ít nhất 6 ký tự" : null,
+                      ),
+                      const SizedBox(height: 20),
+                      AppButton(
+                        text: "Đăng ký",
+                        isLoading: isLoading,
+                        onPressed: registerUser,
+                        color: AppColors.bluePrimary,
+                        textColor: AppColors.white,
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Đã có tài khoản?",
+                            style: AppStyles.STYLE_16.copyWith(
+                              color: AppColors.black,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 20),
-
-                        AppTextField(
-                          hintText: "Họ và tên",
-                          prefixImage: AppImages.icUser,
-                          onChanged: (value) => fullName = value,
-                        ),
-                        const SizedBox(height: 10),
-                        AppTextField(
-                          hintText: "Email",
-                          prefixImage: AppImages.icMail,
-                          onChanged: (value) => email = value,
-                        ),
-                        const SizedBox(height: 10),
-                        AppTextField(
-                          hintText: "Số điện thoại",
-                          prefixImage: AppImages.icPhone,
-                          onChanged: (value) => phone = value,
-                        ),
-                        const SizedBox(height: 10),
-                        AppTextField(
-                          hintText: "Mật khẩu",
-                          prefixImage: AppImages.icPassword,
-                          isPassword: true,
-                          onChanged: (value) => password = value,
-                        ),
-                        const SizedBox(height: 20),
-
-                        AppButton(
-                          text: "Đăng ký",
-                          isLoading: isLoading,
-                          onPressed: () {
-                            if (_formKey.currentState!.validate()) {
-                              _registerUser(context);
-                            }
-                          },
-                          color: AppColors.bluePrimary,
-                          textColor: AppColors.white,
-                        ),
-                        const SizedBox(height: 20),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text("Bạn đã có tài khoản?"),
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ));
-                              },
-                              child: Text(
-                                " Đăng nhập",
-                                style: AppStyles.STYLE_16_BOLD.copyWith(color: AppColors.bluePrimary),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const LoginPage()),
+                              );
+                            },
+                            child: Text(
+                              " Đăng nhập",
+                              style: AppStyles.STYLE_16_BOLD.copyWith(
+                                color: AppColors.bluePrimary,
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                    ],
                   ),
                 ),
               ),

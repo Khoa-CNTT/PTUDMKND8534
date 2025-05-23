@@ -59,7 +59,7 @@ class _MainScreenState extends State<MainScreen> {
 
       case ProductsScreen.id:
         setState(() {
-          _selectedScreen = const ProductsScreen();
+          _selectedScreen =  ProductsScreen();
         });
         break;
     }

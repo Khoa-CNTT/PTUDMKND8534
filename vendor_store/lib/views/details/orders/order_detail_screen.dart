@@ -21,7 +21,7 @@ class OrderDetailScreen extends ConsumerStatefulWidget {
 class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
   final OrderController orderController = OrderController();
 
-  String formatCurrency(int price) {
+  String formatCurrency(double price) {
     final format = NumberFormat.currency(locale: 'vi_VN', symbol: 'đ');
     return format.format(price);
   }
@@ -44,8 +44,11 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final order = widget.order;
     final orders = ref.watch(orderProvider);
- final updatedOrders =   orders.firstWhere((o) => o.id == widget.order.id, orElse: () => widget.order);
+    final orderTotal = ref.watch(orderProvider.notifier).calculateItemTotal(order);
+
+    final updatedOrders =   orders.firstWhere((o) => o.id == widget.order.id, orElse: () => widget.order);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -100,9 +103,10 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                               style: AppStyles.STYLE_12.copyWith(color: AppColors.blackFont),
                             ),
                             const SizedBox(height: 4),
+                            Text("Số lượng: ${widget.order.quantity.toString()}"),
                             Text(
-                              formatCurrency(widget.order.productPrice),
-                              style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.blackFont),
+                              formatCurrency(widget.order.productPrice.toDouble()),
+                              style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.bluePrimary),
                             ),
                             const SizedBox(height: 8),
                             Container(
@@ -147,7 +151,7 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
             child: Container(
               width: 336,
-              height: 170,
+              height: 180,
               decoration: BoxDecoration(
                 color: AppColors.white40,
                 border: Border.all(color: AppColors.white),
@@ -177,6 +181,18 @@ class _OrderDetailScreenState extends ConsumerState<OrderDetailScreen> {
                         Text(
                           "Mã đơn: ${widget.order.id}",
                           style: AppStyles.STYLE_12_BOLD.copyWith(color: AppColors.blackFont),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              "Tổng tiền: ",
+                              style: AppStyles.STYLE_14_BOLD.copyWith(color: AppColors.blackFont),
+                            ),
+                            Text(
+                              formatCurrency(orderTotal),
+                              style: AppStyles.STYLE_16_BOLD.copyWith(color: AppColors.bluePrimary),
+                            ),
+                          ],
                         ),
                       ],
                     ),

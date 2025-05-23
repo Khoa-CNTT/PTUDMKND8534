@@ -6,7 +6,7 @@ class Vendor {
   final String email;
   final String phone;
   final String address;
-  final String image;
+  final String? storeImage;
   final String password;
 
   Vendor({
@@ -15,19 +15,19 @@ class Vendor {
     required this.email,
     required this.phone,
     required this.address,
-    required this.image,
+     this.storeImage,
     required this.password,
   });
 
   // Chuyen doi doi tuong Vendor thanh Map<String, dynamic>
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
+      '_id': id,
       'fullName': fullName,
       'email': email,
       'phone': phone,
       'address': address,
-      'image': image,
+      'storeImage': storeImage,
       'password': password,
     };
   }
@@ -35,11 +35,11 @@ class Vendor {
   // Tao doi tuong Vendor tu Map<String, dynamic>
   factory Vendor.fromMap(Map<String, dynamic> map) {
     return Vendor(
-      id: map['id']?.toString() ?? '',
+      id: map['_id']?.toString() ?? '',
       fullName: map['fullName']?.toString() ?? '',
       email: map['email']?.toString() ?? '',
       phone: map['phone']?.toString() ?? '',
-      image: map['image']?.toString() ?? '',
+      storeImage: map['storeImage']?.toString() ?? '',
       address: map['address']?.toString() ?? '',
       password: map['password']?.toString() ?? '',
     );

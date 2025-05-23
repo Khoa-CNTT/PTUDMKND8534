@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:multi_store/common/base/widgets/details/products/product_item_widget.dart';
 import '../../../../../controller/product_controller.dart';
 import '../../../../../data/model/product.dart';
+import '../../../../../resource/theme/app_colors.dart';
 
 class SearchProductScreen extends StatefulWidget {
   const SearchProductScreen({super.key});
@@ -92,14 +93,21 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
         hintText: 'Tìm kiếm sản phẩm...',
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         filled: true,
-        fillColor: Colors.grey[200],
+        fillColor: AppColors.white,
         suffixIcon: IconButton(
           onPressed: _searchProducts,
-          icon: const Icon(Icons.search, color: Colors.black54),
+          icon: const Icon(Icons.search, color: Colors.blueAccent),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
+        ),
+        focusedBorder:OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(
+            color: AppColors.bluePrimary,
+            width: 2,
+          ),
         ),
       ),
     );
